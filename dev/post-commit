@@ -1,0 +1,72 @@
+#!/usr/bin/python3
+
+"""
+    This is post-commit hook
+
+    This hook creates .git/[commit_hash].sql difference file
+    Between developer database and remote branch database
+    Later during push this file will be applied to branch database
+
+    Source database: pg-dev.[branch_name] is developer database 
+    Target database: pg-branch.[branch_name] is remote database for branch
+
+    Also commit will revert if diff file generation fails
+
+    To allow empty commits use:
+    git commit --allow-empty -a -m "my commit message"
+"""
+
+import sys
+import os
+import subprocess
+from util import color, cmd, get_branch_name, get_commit_hash, undo_commit
+
+commit_hash = get_commit_hash()
+print(color.cyan('Commit hash:'), color.yellow(commit_hash))
+
+sql_diff_path = os.path.join(cmd(['pwd']), '.git', 'sql')
+if not os.path.exists(sql_diff_path):
+    cmd(['mkdir', sql_diff_path])
+
+sql_diff_file = os.path.join(sql_diff_path, commit_hash+'.sql')
+
+branch_name = get_branch_name()
+# this variables come from env
+branch_db_name = 'comp2' #branch_name
+branch_db_hostname = '127.0.0.1'
+branch_db_port = '5432'
+branch_db_username = 'postgres'
+branch_db_password = '1234'
+
+try:
+    cmd(['pgquarrel',
+        '--file', sql_diff_file,
+        # source db
+        '--source-host', '127.0.0.1',
+        '--source-dbname', branch_name,
+        '--source-port', '5432',
+        '--source-username', 'postgres',
+        '--source-no-password', '1234',
+        # target db
+        '--target-host', branch_db_hostname,
+        '--target-dbname', branch_db_name,
+        '--target-port', branch_db_port,
+        '--target-username', branch_db_username,
+        '--target-no-password', branch_db_password,
+        ##
+        '--table-partition', 'false',
+        '--single-transaction', 'true',
+        '--extension', 'true',
+        '--function', 'true',
+        '--procedure', 'true',
+        '--exclude-schema', '^(php_test|ci_test|promo)$',
+    ])
+
+    print(color.cyan(cmd(['cat', sql_diff_file])))
+    print(color.green(sql_diff_file))
+
+except Exception as e:
+    print(color.red('Diff file generation failed, undoing commit...'))
+    undo_commit()
+    sys.exit(1)
+

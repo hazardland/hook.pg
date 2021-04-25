@@ -1,0 +1,68 @@
+#!/usr/bin/python3
+
+# GET BRANCH NAME
+# git symbolic-ref -q HEAD
+
+import sys
+import os
+import subprocess
+from util import color, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd
+
+# აქ ვიგებთ რომელი ბრენჩიდან რომელზე იპუშება
+source_branch = None
+target_branch = None
+input = get_stdin_input()
+if input is None:
+    print(color.cyan('Nothing is being pushed'))
+    sys.exit(0)
+source_branch, _, target_branch, _ = input
+source_branch = extract_branch_name(source_branch)
+target_branch = extract_branch_name(target_branch)
+print(color.cyan('Push from branch:'), color.yellow(source_branch))
+print(color.cyan('Push to branch:'), color.yellow(target_branch))
+
+# აქ ვიგებთ რომელ ბრენჩზე ვდგავართ
+current_branch = get_branch_name()
+print(color.cyan('Current branch:'), color.yellow(current_branch))
+
+# ეს კარგია ვითომ?
+# იგივე ბრენჩზე დაპუშვის შემდეგ გვიწევს სერვერზე დამერჯვა
+# ლოკალურად დამერჯვაც არ შეგვიძლია
+# ლოკალურად შესაძლებელია მხოლოდ
+# ბრენჩის ჩამოტანა
+# ბრენჩის კომიტი
+# ბრენჩზე დაპუშვა
+# ბრენჩის განახლება
+# ბრენჩზე გადასვლა
+
+# აქ ვზღუდავთ მასეტერში ან სტეიჯინგში დაპუშვას მერჯის გარეშე
+if target_branch=='master' or target_branch=='staging':
+    print(color.red('Pushing directly to'), color.yellow(target_branch), color.red('not allowed'))
+    sys.exit(1)
+
+# აქ ვზღუდავთ სხვა ბრენჩში დაპუშვას
+if source_branch!=current_branch and target_branch!=current_branch:
+    print(color.red('You can only push to'), color.yellow(current_branch))
+    sys.exit(1)
+
+commit_hash = get_commit_hash()
+print(color.cyan('Commit hash:'), color.yellow(commit_hash))
+
+sql_diff_path = os.path.join(cmd(['pwd']), '.git', 'sql')
+if not os.path.exists(sql_diff_path):
+    cmd(['mkdir', sql_diff_path])
+
+sql_diff_file = os.path.join(sql_diff_path, commit_hash+'.sql')
+
+# რადგან სხვა ბრენჩში დაპუშვა შევზღუდეთ და ასევე მასტერში და სტეიჯინგშ დაპუშვა შევზღუდეთ
+# (todo: ეს შეზღუდვები გასაკეთებელია სერვერის მხარესაც)
+# და pre-commit ჰუკმა ამ ბრენჩის remote ვერსიასთან დააგენერირა sql ფაილი
+# აქ შეგვიძლია პირდაპირ branch-db ში გავატაროთ sql ფაილი
+# და წარმატების შემთხვევაში push ჩავთვალოთ დასრულებულად
+
+# cmd(['pgquarrel','target-server-config', 'source-server-config', 'global-config'])
+# cmd['psql', 'branch-db-connection-string', '']
+
+cmd(['psql','postgresql://postgres:1234@127.0.01/comp2', 
+     '--set', 'ON_ERROR_STOP=on',
+     '-f', sql_diff_file])
