@@ -63,6 +63,6 @@ sql_diff_file = os.path.join(sql_diff_path, commit_hash+'.sql')
 # cmd(['pgquarrel','target-server-config', 'source-server-config', 'global-config'])
 # cmd['psql', 'branch-db-connection-string', '']
 
-cmd(['psql','postgresql://postgres:1234@127.0.01/comp2', 
+cmd(['psql','postgresql://postgres:1234@127.0.0.1/comp2', 
      '--set', 'ON_ERROR_STOP=on',
      '-f', sql_diff_file])
