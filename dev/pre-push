@@ -36,7 +36,7 @@ print(color.cyan('Current branch:'), color.yellow(current_branch))
 # ბრენჩზე გადასვლა
 
 # აქ ვზღუდავთ მასეტერში ან სტეიჯინგში დაპუშვას მერჯის გარეშე
-if target_branch=='master' or target_branch=='staging':
+if target_branch=='master' or target_branch=='staging' or target_branch=='main':
     print(color.red('Pushing directly to'), color.yellow(target_branch), color.red('not allowed'))
     sys.exit(1)
 
@@ -63,6 +63,17 @@ sql_diff_file = os.path.join(sql_diff_path, commit_hash+'.sql')
 # cmd(['pgquarrel','target-server-config', 'source-server-config', 'global-config'])
 # cmd['psql', 'branch-db-connection-string', '']
 
-cmd(['psql','postgresql://postgres:1234@127.0.0.1/comp2', 
+pg_branch_name = target_branch
+# ეს ცვლადები მოდის დოკერის .config ფაილიდან
+pg_branch_hostname = os.getenv('PG_BRANCH_HOSTNAME')
+pg_branch_port = os.getenv('PG_BRANCH_PORT')
+pg_branch_password = os.getenv('PG_BRANCH_PASSWORD')
+pg_branch_username = os.getenv('PG_BRANCH_USERNAME')
+# pg_branch_hostname = '127.0.0.1'
+# pg_branch_password = '1234'
+# pg_branch_username = 'postgres'
+# pg_branch_port = '5432'
+
+cmd(['psql',f'postgresql://{pg_branch_username}:{pg_branch_password}@{pg_branch_hostname}:{pg_branch_port}/{pg_branch_name}', 
      '--set', 'ON_ERROR_STOP=on',
      '-f', sql_diff_file])

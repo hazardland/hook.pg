@@ -1,0 +1,38 @@
+#!/usr/bin/python3
+
+# GET BRANCH NAME
+# git symbolic-ref -q HEAD
+
+import sys
+import os
+import subprocess
+from util import color, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd
+
+print(color.pink('We are in post checkout now!'))
+print(color.yellow(str(sys.argv)))
+
+
+if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
+    print(color.cyan('Hashes seem to be equal and checkout type is 1'))
+
+    # აქ ვადგენ ბაზა არსებობს თუ არ მაგის შესამოწმებელი ფოლდერის მისამართს
+    # რატომღაც ადრე გადავწყვიტე რომ ბაზის არსებობა შემემოწმებინა ფაილის არსებობით
+    # აა გავიხსენე: ბაზა არსებობს + ბაზა დასასინქია თუ არ პირველჯერად მაგას ვადგენთ
+    db_check_path = os.path.join(cmd(['pwd']), '.git', 'db')
+    if not os.path.exists(db_check_path):
+        cmd(['mkdir', db_check_path])
+
+    # აქ თვითონ ბაზის შესაბამისი ფაილის სახელს მისამართს ვადგენ
+    branch_name = get_branch_name()
+    db_check_file_path = os.path.join(db_check_path, branch_name)
+
+    print(color.cyan('File to check is'+db_check_file_path))
+    if not os.path.exists(db_check_file_path):
+        print(color.red('We should create a db!'))
+        parent_branch = cmd(['git', 'parent'])
+        print(color.cyan('From branch: '), color.yellow(parent_branch))
+        print(color.cyan('To branch: '), color.yellow(branch_name))
+        git_hash = get_commit_hash()
+        print(color.cyan('Commit hash'), color.yellow(git_hash))
+
+        #cmd(['touch', db_check_file_path])

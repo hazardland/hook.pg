@@ -4,6 +4,9 @@ import os
 
 if sys.platform.lower() == "win32":
     os.system('color')
+
+# for i in list(range(31,37))+list(range(91,97)): print("\033["+str(i)+"m\\033["+str(i)+"m TEXT \\033[0;39m\033[0;39m")
+
 class color:
     black = lambda x: '\033[30m' + str(x)+'\033[0;39m'
     red = lambda x: '\033[31m' + str(x)+'\033[0;39m'
@@ -13,6 +16,8 @@ class color:
     magenta = lambda x: '\033[35m' + str(x)+'\033[0;39m'
     cyan = lambda x: '\033[36m' + str(x)+'\033[0;39m'
     white = lambda x: '\033[37m' + str(x)+'\033[0;39m'
+    lime = lambda x: '\033[92m' + str(x)+'\033[0;39m'
+    pink = lambda x: '\033[95m' + str(x)+'\033[0;39m'
 
 def cmd(command):
     result = subprocess.check_output(command)
