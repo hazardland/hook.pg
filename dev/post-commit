@@ -40,6 +40,7 @@ pg_dev_hostname = os.getenv('PG_DEV_HOSTNAME')
 pg_dev_port = os.getenv('PG_DEV_PORT')
 pg_dev_password = os.getenv('PG_DEV_PASSWORD')
 pg_dev_username = os.getenv('PG_DEV_USERNAME')
+
 # pg_dev_hostname = '127.0.0.1'
 # pg_dev_port = '5432'
 # pg_dev_username =  'postgres'
@@ -52,6 +53,14 @@ pg_branch_hostname = os.getenv('PG_BRANCH_HOSTNAME')
 pg_branch_port = os.getenv('PG_BRANCH_PORT')
 pg_branch_password = os.getenv('PG_BRANCH_PASSWORD')
 pg_branch_username = os.getenv('PG_BRANCH_USERNAME')
+
+print(color.cyan('PG_BRANCH_HOSTNAME:'), color.yellow(pg_branch_hostname))
+print(color.cyan('PG_BRANCH_PORT:'), color.yellow(pg_branch_port))
+print(color.cyan('PG_BRANCH_USERNAME:'), color.yellow(pg_branch_username))
+print(color.cyan('PG_BRANCH_PASSWORD:'), color.yellow(pg_branch_password))
+print(color.cyan('PG_BRANCH_DATABASE:'), color.yellow(pg_branch_name))
+
+
 # pg_branch_hostname = '127.0.0.1'
 # pg_branch_port = '5432'
 # pg_branch_username = 'postgres'
