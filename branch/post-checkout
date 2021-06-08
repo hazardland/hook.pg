@@ -12,7 +12,6 @@ from util import color, get_branch_name, get_commit_hash, get_stdin_input, extra
 print(color.pink('We are in post checkout now!'))
 print(color.yellow(str(sys.argv)))
 
-
 if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
     print(color.cyan('Hashes seem to be equal and checkout type is 1'))
 
@@ -41,6 +40,7 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
         pg_branch_port = os.getenv('PG_BRANCH_PORT')
         pg_branch_password = os.getenv('PG_BRANCH_PASSWORD')
         pg_branch_username = os.getenv('PG_BRANCH_USERNAME')
+        print(f'postgresql://{pg_branch_username}:{pg_branch_password}@{pg_branch_hostname}:{pg_branch_port}/{branch_name}')
 
         try:
             cmd(['pgquarrel',
