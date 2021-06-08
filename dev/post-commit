@@ -79,7 +79,7 @@ try:
         # target db
         '--target-host', pg_branch_hostname,
         # '--target-dbname', pg_branch_db,
-        '--source-dbname', f'"host={pg_branch_hostname} port={pg_branch_port} dbname={pg_branch_db} user={pg_branch_username} password={pg_branch_password}"',
+        '--source-dbname', f'host={pg_branch_hostname} port={pg_branch_port} dbname={pg_branch_db} user={pg_branch_username} password={pg_branch_password}',
         '--target-port', pg_branch_port,
         '--target-username', pg_branch_username,
         '--target-no-password', 'true',
