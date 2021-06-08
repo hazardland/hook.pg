@@ -38,7 +38,7 @@ pg_dev_db = branch_name
 
 pg_dev_hostname = os.getenv('PG_DEV_HOSTNAME')
 pg_dev_port = os.getenv('PG_DEV_PORT')
-pg_dev_password = os.getenv('PG_DEV_PASSWORD')
+pg_dev_password = os.getenv('PG_DEV_PASSWORD').replace("\"", "\\\"")
 pg_dev_username = os.getenv('PG_DEV_USERNAME')
 
 # pg_dev_hostname = '127.0.0.1'
@@ -51,7 +51,7 @@ pg_dev_username = os.getenv('PG_DEV_USERNAME')
 pg_branch_db = branch_name
 pg_branch_hostname = os.getenv('PG_BRANCH_HOSTNAME')
 pg_branch_port = os.getenv('PG_BRANCH_PORT')
-pg_branch_password = os.getenv('PG_BRANCH_PASSWORD')
+pg_branch_password = os.getenv('PG_BRANCH_PASSWORD').replace("\"", "\\\"")
 pg_branch_username = os.getenv('PG_BRANCH_USERNAME')
 
 print(color.cyan('PG_BRANCH_HOSTNAME:'), color.yellow(pg_branch_hostname))
@@ -72,14 +72,14 @@ try:
         # source db
         #'--source-host', pg_dev_hostname,
         # '--source-dbname', pg_dev_db,
-        '--source-dbname', f'"host={pg_dev_hostname} port={pg_dev_port} dbname={pg_dev_db} useranme={pg_dev_username} password={pg_dev_password.replace("\"", "\\\"")}"',
+        '--source-dbname', f'"host={pg_dev_hostname} port={pg_dev_port} dbname={pg_dev_db} useranme={pg_dev_username} password={pg_dev_password}"',
         # '--source-port', pg_dev_port,
         # '--source-username', pg_dev_username,
         '--source-no-password', pg_dev_password,
         # target db
         #'--target-host', pg_branch_hostname,
         # '--target-dbname', pg_branch_db,
-        '--source-dbname', f'"host={pg_branch_hostname} port={pg_branch_port} dbname={pg_branch_db} useranme={pg_branch_username} password={pg_branch_password.replace("\"", "\\\"")}"',
+        '--source-dbname', f'"host={pg_branch_hostname} port={pg_branch_port} dbname={pg_branch_db} useranme={pg_branch_username} password={pg_branch_password}"',
         # '--target-port', pg_branch_port,
         # '--target-username', pg_branch_username,
         # '--target-no-password', pg_branch_password,
