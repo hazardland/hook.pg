@@ -33,8 +33,8 @@ sql_diff_file = os.path.join(sql_diff_path, commit_hash+'.sql')
 branch_name = get_branch_name()
 # this variables come from env
 # local db
-pg_dev_name = branch_name
-#pg_dev_name = 'comp1'
+pg_dev_db = branch_name
+#pg_dev_db = 'comp1'
 
 pg_dev_hostname = os.getenv('PG_DEV_HOSTNAME')
 pg_dev_port = os.getenv('PG_DEV_PORT')
@@ -47,8 +47,8 @@ pg_dev_username = os.getenv('PG_DEV_USERNAME')
 # pg_dev_password = '1234'
 
 # branch db
-pg_branch_name = branch_name
 #pg_branch_name = 'comp2'
+pg_branch_db = branch_name
 pg_branch_hostname = os.getenv('PG_BRANCH_HOSTNAME')
 pg_branch_port = os.getenv('PG_BRANCH_PORT')
 pg_branch_password = os.getenv('PG_BRANCH_PASSWORD')
@@ -58,7 +58,7 @@ print(color.cyan('PG_BRANCH_HOSTNAME:'), color.yellow(pg_branch_hostname))
 print(color.cyan('PG_BRANCH_PORT:'), color.yellow(pg_branch_port))
 print(color.cyan('PG_BRANCH_USERNAME:'), color.yellow(pg_branch_username))
 print(color.cyan('PG_BRANCH_PASSWORD:'), color.yellow(pg_branch_password))
-print(color.cyan('PG_BRANCH_DATABASE:'), color.yellow(pg_branch_name))
+print(color.cyan('PG_BRANCH_DATABASE:'), color.yellow(pg_branch_db))
 
 
 # pg_branch_hostname = '127.0.0.1'
@@ -70,17 +70,19 @@ try:
     cmd(['pgquarrel',
         '--file', sql_diff_file,
         # source db
-        '--source-host', pg_dev_hostname,
-        '--source-dbname', pg_dev_name,
-        '--source-port', pg_dev_port,
-        '--source-username', pg_dev_username,
+        #'--source-host', pg_dev_hostname,
+        # '--source-dbname', pg_dev_db,
+        '--source-dbname', f'"host={pg_dev_hostname} port={pg_dev_port} dbname={pg_dev_db} useranme={pg_dev_username} password={pg_dev_password.replace("\"", "\\\"")}"',
+        # '--source-port', pg_dev_port,
+        # '--source-username', pg_dev_username,
         '--source-no-password', pg_dev_password,
         # target db
-        '--target-host', pg_branch_hostname,
-        '--target-dbname', pg_branch_name,
-        '--target-port', pg_branch_port,
-        '--target-username', pg_branch_username,
-        '--target-no-password', pg_branch_password,
+        #'--target-host', pg_branch_hostname,
+        # '--target-dbname', pg_branch_db,
+        '--source-dbname', f'"host={pg_branch_hostname} port={pg_branch_port} dbname={pg_branch_db} useranme={pg_branch_username} password={pg_branch_password.replace("\"", "\\\"")}"',
+        # '--target-port', pg_branch_port,
+        # '--target-username', pg_branch_username,
+        # '--target-no-password', pg_branch_password,
         ##
         '--table-partition', 'false',
         '--single-transaction', 'true',
