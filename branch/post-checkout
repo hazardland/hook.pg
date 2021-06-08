@@ -53,6 +53,10 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
                 '-c', f'CREATE DATABASE {branch_name}'])
         except:
             pass  
+        
+        if not parent_branch:
+            cmd(['touch', db_init_sql_file])
+            sys.exit(0)
 
         try:
             cmd(['pgquarrel',
@@ -79,7 +83,8 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
 
         except Exception as e:
             print(color.red('Diff file generation failed, undoing commit...'))
-            cmd(['rm', db_init_sql_file])
+            if os.path.exists(db_init_sql_file):
+                cmd(['rm', db_init_sql_file])
             sys.exit(1)
 
         
