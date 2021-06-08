@@ -61,7 +61,6 @@ try:
         # source db
         '--source-dbname', f'hostaddr={pg_dev_hostname} port={pg_dev_port} dbname={pg_dev_db} user={pg_dev_username} password={pg_dev_password}',
         # target db
-        '--target-host', pg_branch_hostname,
         '--target-dbname', f'hostaddr={pg_branch_hostname} port={pg_branch_port} dbname={pg_branch_db} user={pg_branch_username} password={pg_branch_password}',
         # common settings
         '--table-partition', 'false',

@@ -48,8 +48,11 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
         # except:
         #     pass 
 
-        cmd(['psql',f'postgresql://{pg_branch_username}:{pg_branch_password}@{pg_branch_hostname}:{pg_branch_port}/', 
-            '-c', f'CREATE DATABASE {branch_name}'])  
+        try:
+            cmd(['psql',f'postgresql://{pg_branch_username}:{pg_branch_password}@{pg_branch_hostname}:{pg_branch_port}/', 
+                '-c', f'CREATE DATABASE {branch_name}'])
+        except:
+            pass  
 
         try:
             cmd(['pgquarrel',
@@ -57,7 +60,6 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
                 # source db
                 '--source-dbname', f'hostaddr={pg_branch_hostname} port={pg_branch_port} dbname={parent_branch} user={pg_branch_username} password={pg_branch_password}',
                 # target db
-                '--target-host', pg_branch_hostname,
                 '--target-dbname', f'hostaddr={pg_branch_hostname} port={pg_branch_port} dbname={branch_name} user={pg_branch_username} password={pg_branch_password}',
                 # common settings
                 '--table-partition', 'false',
@@ -71,12 +73,15 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
             print(color.cyan(cmd(['cat', db_init_sql_file])))
             print(color.green(db_init_sql_file))
 
+            cmd(['psql',f'postgresql://{pg_branch_username}:{pg_branch_password}@{pg_branch_hostname}:{pg_branch_port}/{branch_name}', 
+                '--set', 'ON_ERROR_STOP=on',
+                '-f', db_init_sql_file])
+
         except Exception as e:
             print(color.red('Diff file generation failed, undoing commit...'))
+            cmd(['rm', db_init_sql_file])
             sys.exit(1)
 
-        cmd(['psql',f'postgresql://{pg_branch_username}:{pg_branch_password}@{pg_branch_hostname}:{pg_branch_port}/{branch_name}', 
-            '--set', 'ON_ERROR_STOP=on',
-            '-f', db_init_sql_file])        
+        
 
         #cmd(['touch', db_init_sql_file])
