@@ -5,6 +5,7 @@
 
 import sys
 import os
+import socket
 import subprocess
 from util import color, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd
 
@@ -24,10 +25,10 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
 
     # აქ თვითონ ბაზის შესაბამისი ფაილის სახელს მისამართს ვადგენ
     branch_name = get_branch_name()
-    db_check_file_path = os.path.join(db_check_path, branch_name)
+    db_init_sql_file = os.path.join(db_check_path, branch_name+'.sql')
 
-    print(color.cyan('File to check is'+db_check_file_path))
-    if not os.path.exists(db_check_file_path):
+    print(color.cyan('File to check is'+db_init_sql_file))
+    if not os.path.exists(db_init_sql_file):
         print(color.red('We should create a db!'))
         parent_branch = cmd(['git', 'parent'])
         print(color.cyan('From branch: '), color.yellow(parent_branch))
@@ -35,4 +36,38 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
         git_hash = get_commit_hash()
         print(color.cyan('Commit hash'), color.yellow(git_hash))
 
-        #cmd(['touch', db_check_file_path])
+        # ეს ცვლადები მოდის დოკერის .config ფაილიდან
+        pg_branch_hostname =  socket.gethostbyname(os.getenv('PG_BRANCH_HOSTNAME'))
+        pg_branch_port = os.getenv('PG_BRANCH_PORT')
+        pg_branch_password = os.getenv('PG_BRANCH_PASSWORD')
+        pg_branch_username = os.getenv('PG_BRANCH_USERNAME')
+
+        try:
+            cmd(['pgquarrel',
+                '--file', db_init_sql_file,
+                # source db
+                '--source-dbname', f'hostaddr={pg_branch_hostname} port={pg_branch_port} dbname={parent_branch} user={pg_branch_username} password={pg_branch_password}',
+                # target db
+                '--target-host', pg_branch_hostname,
+                '--target-dbname', f'hostaddr={pg_branch_hostname} port={pg_branch_port} dbname={branch_name} user={pg_branch_username} password={pg_branch_password}',
+                # common settings
+                '--table-partition', 'false',
+                '--single-transaction', 'true',
+                '--extension', 'true',
+                '--function', 'true',
+                '--procedure', 'true',
+                '--exclude-schema', '^(php_test|ci_test|promo)$',
+            ])
+
+            print(color.cyan(cmd(['cat', db_init_sql_file])))
+            print(color.green(db_init_sql_file))
+
+        except Exception as e:
+            print(color.red('Diff file generation failed, undoing commit...'))
+            sys.exit(1)
+
+        cmd(['psql',f'postgresql://{pg_branch_username}:{pg_branch_password}@{pg_branch_hostname}:{pg_branch_port}/{branch_name}', 
+            '--set', 'ON_ERROR_STOP=on',
+            '-f', db_init_sql_file])        
+
+        #cmd(['touch', db_init_sql_file])
