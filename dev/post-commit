@@ -18,6 +18,7 @@
 
 import sys
 import os
+import socket
 import subprocess
 from util import color, cmd, get_branch_name, get_commit_hash, undo_commit
 
@@ -36,7 +37,7 @@ branch_name = get_branch_name()
 pg_dev_db = branch_name
 #pg_dev_db = 'comp1'
 
-pg_dev_hostname = os.getenv('PG_DEV_HOSTNAME')
+pg_dev_hostname = socket.gethostbyname(os.getenv('PG_DEV_HOSTNAME'))
 pg_dev_port = os.getenv('PG_DEV_PORT')
 pg_dev_password = os.getenv('PG_DEV_PASSWORD').replace("\"", "\\\"")
 pg_dev_username = os.getenv('PG_DEV_USERNAME')
@@ -49,7 +50,7 @@ pg_dev_username = os.getenv('PG_DEV_USERNAME')
 # branch db
 #pg_branch_name = 'comp2'
 pg_branch_db = branch_name
-pg_branch_hostname = os.getenv('PG_BRANCH_HOSTNAME')
+pg_branch_hostname = socket.gethostbyname(os.getenv('PG_BRANCH_HOSTNAME'))
 pg_branch_port = os.getenv('PG_BRANCH_PORT')
 pg_branch_password = os.getenv('PG_BRANCH_PASSWORD').replace("\"", "\\\"")
 pg_branch_username = os.getenv('PG_BRANCH_USERNAME')

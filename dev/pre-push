@@ -5,6 +5,7 @@
 
 import sys
 import os
+import socket
 import subprocess
 from util import color, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd
 
@@ -65,7 +66,7 @@ sql_diff_file = os.path.join(sql_diff_path, commit_hash+'.sql')
 
 pg_branch_name = target_branch
 # ეს ცვლადები მოდის დოკერის .config ფაილიდან
-pg_branch_hostname = os.getenv('PG_BRANCH_HOSTNAME')
+pg_branch_hostname =  socket.gethostbyname(os.getenv('PG_BRANCH_HOSTNAME'))
 pg_branch_port = os.getenv('PG_BRANCH_PORT')
 pg_branch_password = os.getenv('PG_BRANCH_PASSWORD')
 pg_branch_username = os.getenv('PG_BRANCH_USERNAME')
