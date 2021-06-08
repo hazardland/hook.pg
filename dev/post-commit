@@ -59,7 +59,8 @@ print(color.cyan('PG_BRANCH_PORT:'), color.yellow(pg_branch_port))
 print(color.cyan('PG_BRANCH_USERNAME:'), color.yellow(pg_branch_username))
 print(color.cyan('PG_BRANCH_PASSWORD:'), color.yellow(pg_branch_password))
 print(color.cyan('PG_BRANCH_DATABASE:'), color.yellow(pg_branch_db))
-print(f'"host={pg_branch_hostname} port={pg_branch_port} dbname={pg_branch_db} user={pg_branch_username} password={pg_branch_password}"')
+print(f'hostaddr={pg_dev_hostname} port={pg_dev_port} dbname={pg_dev_db} user={pg_dev_username} password={pg_dev_password}')
+print(f'hostaddr={pg_branch_hostname} port={pg_branch_port} dbname={pg_branch_db} user={pg_branch_username} password={pg_branch_password}')
 
 # pg_branch_hostname = '127.0.0.1'
 # pg_branch_port = '5432'
