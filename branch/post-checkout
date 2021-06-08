@@ -42,6 +42,12 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
         pg_branch_username = os.getenv('PG_BRANCH_USERNAME')
         print(f'postgresql://{pg_branch_username}:{pg_branch_password}@{pg_branch_hostname}:{pg_branch_port}/{branch_name}')
 
+        cmd(['psql',f'postgresql://{pg_branch_username}:{pg_branch_password}@{pg_branch_hostname}:{pg_branch_port}/', 
+            '-c', f'CREATE DATABASE {parent_branch}'])  
+
+        cmd(['psql',f'postgresql://{pg_branch_username}:{pg_branch_password}@{pg_branch_hostname}:{pg_branch_port}/', 
+            '-c', f'CREATE DATABASE {branch_name}'])  
+
         try:
             cmd(['pgquarrel',
                 '--file', db_init_sql_file,
