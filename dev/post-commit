@@ -75,14 +75,14 @@ try:
         '--source-dbname', f'"host={pg_dev_hostname} port={pg_dev_port} dbname={pg_dev_db} user={pg_dev_username} passwd={pg_dev_password}"',
         '--source-port', pg_dev_port,
         '--source-username', pg_dev_username,
-        '--source-no-password', pg_dev_password,
+        '--source-password', pg_dev_password,
         # target db
         '--target-host', pg_branch_hostname,
         # '--target-dbname', pg_branch_db,
         '--source-dbname', f'"host={pg_branch_hostname} port={pg_branch_port} dbname={pg_branch_db} user={pg_branch_username} passwd={pg_branch_password}"',
         '--target-port', pg_branch_port,
         '--target-username', pg_branch_username,
-        '--target-no-password', pg_branch_password,
+        '--target-password', pg_branch_password,
         ##
         '--table-partition', 'false',
         '--single-transaction', 'true',
