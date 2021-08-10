@@ -31,7 +31,7 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
     db_init_sql_file = os.path.join(db_check_path, current_branch+'.sql')
 
     print(color.cyan('File to check is'+db_init_sql_file))
-    if not os.path.exists(db_init_sql_file):
+    if current_branch not in ['master', 'staging', 'main'] and not os.path.exists(db_init_sql_file):
         print(color.red('We should create a db!'))
         parent_branch = cmd(['git', 'parent'])
         print(color.cyan('From branch: '), color.yellow(parent_branch))
@@ -58,7 +58,7 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
 
         try:
             subprocess.call(['psql',f'postgresql://{pg_from_username}:{pg_from_password}@{pg_from_hostname}:{pg_from_port}/', 
-                '-c', f'CREATE DATABASE {parent_branch}'])
+                '-c', f'CREATE DATABASE {pg_from_db}'])
         except:
             pass 
 
