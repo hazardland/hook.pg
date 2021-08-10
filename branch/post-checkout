@@ -57,13 +57,13 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
         print(f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/{pg_to_db}')
 
         try:
-            cmd(['psql',f'postgresql://{pg_from_username}:{pg_from_password}@{pg_from_hostname}:{pg_from_port}/', 
+            subprocess.call(['psql',f'postgresql://{pg_from_username}:{pg_from_password}@{pg_from_hostname}:{pg_from_port}/', 
                 '-c', f'CREATE DATABASE {parent_branch}'])
         except:
             pass 
 
         try:
-            cmd(['psql',f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/', 
+            subprocess.call(['psql',f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/', 
                 '-c', f'CREATE DATABASE {pg_to_db}'])
         except:
             pass  
