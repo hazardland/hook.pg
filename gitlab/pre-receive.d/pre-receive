@@ -11,3 +11,6 @@ from util import color, get_branch_name, get_commit_hash, get_stdin_input, extra
 
 print(color.pink('=============PRE_RECEIVE_HOOK================'))
 print(color.yellow(str(sys.argv)))
+
+with open("test.txt", "a") as myfile:
+    myfile.write("it run?")
