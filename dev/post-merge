@@ -13,4 +13,28 @@ print(color.pink('=============DEV_POST_MERGE_HOOK================'))
 print(color.yellow(str(sys.argv)))
 input = get_stdin_input()
 print(color.yellow(str(input)))
-print(cmd(['ps', '-o', 'args='+str(os.getppid())]))
+command = cmd(['ps', '-o', 'args='+str(os.getppid())])
+print(command.splitlines())
+print(command[2])
+if command[2].startswith('git pull'):
+    print('It is pull!')
+elif command[2].startswith('git merge'):
+    print('It is merge with ', command[2].strip("git merge "))
+
+# Check multi commit merge
+# Solve git fetch hook
+
+'''
+1302
+/bin/bash
+git pull
+/usr/lib/git-core/git merge FETCH_HEAD
+/usr/bin/python3 ../hooks/dev/post-merge 0
+ps -o args=1302
+
+1353
+/bin/bash
+git merge branch1
+/usr/bin/python3 ../hooks/dev/post-merge 0
+ps -o args=1353
+'''
