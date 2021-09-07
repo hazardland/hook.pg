@@ -9,5 +9,5 @@ import socket
 import subprocess
 from util import color, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd
 
-print(color.pink('=============PRE_MERGE_HOOK================'))
+print(color.pink('=============DEV_POST_MERGE_HOOK================'))
 print(color.yellow(str(sys.argv)))
