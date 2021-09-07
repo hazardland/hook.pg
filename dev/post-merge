@@ -11,3 +11,5 @@ from util import color, get_branch_name, get_commit_hash, get_stdin_input, extra
 
 print(color.pink('=============DEV_POST_MERGE_HOOK================'))
 print(color.yellow(str(sys.argv)))
+input = get_stdin_input()
+print(color.yellow(str(input)))
