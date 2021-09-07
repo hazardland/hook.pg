@@ -24,6 +24,8 @@ elif command[2].startswith('git merge'):
 # Check multi commit merge
 # Solve git fetch hook
 
+branch_name = get_branch_name()
+print('Branch name is', branch_name)
 '''
 1302
 /bin/bash
