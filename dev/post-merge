@@ -14,7 +14,7 @@ print(color.yellow(str(sys.argv)))
 input = get_stdin_input()
 print(color.yellow(str(input)))
 command = cmd(['ps', '-o', 'args='+str(os.getppid())])
-print(command.splitlines())
+command = command.splitlines()
 print(command[2])
 if command[2].startswith('git pull'):
     print('It is pull!')
