@@ -1,72 +1,51 @@
 #!/usr/bin/python3
 
-# GET BRANCH NAME
-# git symbolic-ref -q HEAD
+"""
+    This hook happens before push
+    
+    This hook runs diff sql file generated during commit
+    Into branch database in branch server
+
+    If this hook fails push also fails
+"""
 
 import sys
 import os
 import socket
 import subprocess
-from util import color, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd
+from util import diff_file_path, pg_apply, color, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd
 
-# აქ ვიგებთ რომელი ბრენჩიდან რომელზე იპუშება
-source_branch = None
-target_branch = None
+# Get stdin input
 input = get_stdin_input()
 if input is None:
     print(color.cyan('Nothing is being pushed'))
     sys.exit(0)
+
+# Extract input and get source branch and target branch
+source_branch = None
+target_branch = None
 source_branch, _, target_branch, _ = input
 source_branch = extract_branch_name(source_branch)
 target_branch = extract_branch_name(target_branch)
 print(color.cyan('Push from branch:'), color.yellow(source_branch))
 print(color.cyan('Push to branch:'), color.yellow(target_branch))
 
-# აქ ვიგებთ რომელ ბრენჩზე ვდგავართ
+# Get what branch is active (it differs from source branch)
 current_branch = get_branch_name()
 print(color.cyan('Current branch:'), color.yellow(current_branch))
 
-# იგივე ბრენჩზე დაპუშვის შემდეგ გვიწევს სერვერზე დამერჯვა
-# ლოკალურად დამერჯვაც არ შეგვიძლია
-# ლოკალურად შესაძლებელია მხოლოდ
-# ბრენჩის ჩამოტანა: git pull
-# ბრენჩის კომიტი: git commit +
-# ბრენჩზე დაპუშვა: git push +
-# ბრენჩის განახლება: git pull
-# ბრენჩზე გადასვლა: git checkout +
-
-# აქ ვზღუდავთ მასეტერში ან სტეიჯინგში დაპუშვას მერჯის გარეშე
+# Disable pushing in master or in staging branches
 if target_branch=='master' or target_branch=='staging' or target_branch=='main':
     print(color.red('Pushing directly to'), color.yellow(target_branch), color.red('not allowed'))
     sys.exit(1)
 
-# აქ ვზღუდავთ სხვა ბრენჩში დაპუშვას
+# Disable pushing from different branch other than current
 if source_branch!=current_branch and target_branch!=current_branch:
     print(color.red('You can only push to'), color.yellow(current_branch))
     sys.exit(1)
 
-commit_hash = get_commit_hash()
-print(color.cyan('Commit hash:'), color.yellow(commit_hash))
+# Apply diff to branch database
+pg_apply(pg_to_env='pg_branch', 
+         pg_to_db=target_branch, 
+         pg_sql_file=diff_file_path('psuh', exit_if_absent=True))
 
-sql_diff_path = os.path.join(cmd(['pwd']), '.git', 'sql')
-if not os.path.exists(sql_diff_path):
-    cmd(['mkdir', sql_diff_path])
-
-sql_diff_file = os.path.join(sql_diff_path, commit_hash+'.sql')
-
-# რადგან სხვა ბრენჩში დაპუშვა შევზღუდეთ და ასევე მასტერში და სტეიჯინგშ დაპუშვა შევზღუდეთ
-# (todo: ეს შეზღუდვები გასაკეთებელია სერვერის მხარესაც)
-# და pre-commit ჰუკმა ამ ბრენჩის remote ვერსიასთან დააგენერირა sql ფაილი
-# აქ შეგვიძლია პირდაპირ branch-db ში გავატაროთ sql ფაილი
-# და წარმატების შემთხვევაში push ჩავთვალოთ დასრულებულად
-
-pg_branch_name = target_branch
-# ეს ცვლადები მოდის დოკერის .config ფაილიდან
-pg_branch_hostname =  socket.gethostbyname(os.getenv('PG_BRANCH_HOSTNAME'))
-pg_branch_port = os.getenv('PG_BRANCH_PORT')
-pg_branch_password = os.getenv('PG_BRANCH_PASSWORD')
-pg_branch_username = os.getenv('PG_BRANCH_USERNAME')
-
-cmd(['psql',f'postgresql://{pg_branch_username}:{pg_branch_password}@{pg_branch_hostname}:{pg_branch_port}/{pg_branch_name}', 
-     '--set', 'ON_ERROR_STOP=on',
-     '-f', sql_diff_file])

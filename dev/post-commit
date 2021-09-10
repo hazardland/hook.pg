@@ -1,14 +1,11 @@
 #!/usr/bin/python3
 
 """
-    This is post-commit hook
+    This hook happens after commit
 
     This hook creates .git/[commit_hash].sql difference file
     Between developer database and remote branch database
-    Later during push this file will be applied to branch database
-
-    Source database: pg-dev.[branch_name] is developer database 
-    Target database: pg-branch.[branch_name] is remote database for branch
+    Later during push this file will be applied to branch database in pre-push hook
 
     Also commit will revert if diff file generation fails
 
@@ -20,68 +17,17 @@ import sys
 import os
 import socket
 import subprocess
-from util import color, cmd, get_branch_name, get_commit_hash, undo_commit
+from util import color, cmd, diff_file_path, get_branch_name, get_commit_hash, pg_sync, undo_commit
 
-commit_hash = get_commit_hash()
-print(color.cyan('Commit hash:'), color.yellow(commit_hash))
-
-sql_diff_path = os.path.join(cmd(['pwd']), '.git', 'sql')
-if not os.path.exists(sql_diff_path):
-    cmd(['mkdir', sql_diff_path])
-
-sql_diff_file = os.path.join(sql_diff_path, commit_hash+'.sql')
 
 branch_name = get_branch_name()
 
-# dev db
-pg_dev_db = branch_name
-pg_dev_hostname = socket.gethostbyname(os.getenv('PG_DEV_HOSTNAME'))
-pg_dev_port = os.getenv('PG_DEV_PORT')
-pg_dev_password = os.getenv('PG_DEV_PASSWORD').replace("\"", "\\\"")
-pg_dev_username = os.getenv('PG_DEV_USERNAME')
+pg_sync(pg_from_env='pg_dev', 
+        pg_to_env='pg_branch', 
+        pg_from_db=branch_name, 
+        pg_to_db=branch_name, 
+        pg_sql_file=diff_file_path('push'),
+        pg_apply=False)
 
-# branch db
-pg_branch_db = branch_name
-pg_branch_hostname = socket.gethostbyname(os.getenv('PG_BRANCH_HOSTNAME'))
-pg_branch_port = os.getenv('PG_BRANCH_PORT')
-pg_branch_password = os.getenv('PG_BRANCH_PASSWORD').replace("\"", "\\\"")
-pg_branch_username = os.getenv('PG_BRANCH_USERNAME')
-
-print(color.cyan('PG_BRANCH_HOSTNAME:'), color.yellow(pg_branch_hostname))
-print(color.cyan('PG_BRANCH_PORT:'), color.yellow(pg_branch_port))
-print(color.cyan('PG_BRANCH_USERNAME:'), color.yellow(pg_branch_username))
-print(color.cyan('PG_BRANCH_PASSWORD:'), color.yellow(pg_branch_password))
-print(color.cyan('PG_BRANCH_DATABASE:'), color.yellow(pg_branch_db))
-print(f'hostaddr={pg_dev_hostname} port={pg_dev_port} dbname={pg_dev_db} user={pg_dev_username} password={pg_dev_password}')
-print(f'hostaddr={pg_branch_hostname} port={pg_branch_port} dbname={pg_branch_db} user={pg_branch_username} password={pg_branch_password}')
-
-try:
-    cmd(['pgquarrel',
-        '--file', sql_diff_file,
-        # source db
-        '--source-dbname', f'hostaddr={pg_dev_hostname} port={pg_dev_port} dbname={pg_dev_db} user={pg_dev_username} password={pg_dev_password}',
-        # target db
-        '--target-dbname', f'hostaddr={pg_branch_hostname} port={pg_branch_port} dbname={pg_branch_db} user={pg_branch_username} password={pg_branch_password}',
-        # common settings
-        '--table-partition', 'false',
-        '--single-transaction', 'true',
-        '--extension', 'true',
-        '--function', 'true',
-        '--procedure', 'true',
-        '--exclude-schema', '^(php_test|ci_test|promo)$',
-    ])
-
-    print(color.cyan(cmd(['cat', sql_diff_file])))
-    print(color.green(sql_diff_file))
-
-except Exception as e:
-    print(color.red('Diff file generation failed, undoing commit...'))
-    undo_commit()
-    sys.exit(1)
-
-# აქ კარგი იქნებოდა ლოკალურად ბრენჩის შექმნის 
-# და ლოკალური ბრენჩის დამერჯვის ფუნქციაც რომ გვქონდეს
-# მაგრამ მერე რა ბრანჩს შევადარო ხოლმე კომიტის დროს მიმდინარე ბრენჩი?
-# კიარდა როგორ მივხვდე რომ სერვერის ბრანჩს არ უნდა შევადარო და ლოკალურ ბრანჩს უნდა შევადარო
-# ჩვეულებრივად კომიტის დროს: 
-# ბრანჩის სახელიან ლოკალურ ბაზას ვადარებ სერვერზე არსებულ ბრანჩის სახელიან ბაზას
+# Create new branch and commit (?)
+#   Maybe post-checkout hook will do it

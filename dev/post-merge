@@ -1,13 +1,15 @@
 #!/usr/bin/python3
 
-# GET BRANCH NAME
-# git symbolic-ref -q HEAD
+'''
+    This hook happens after pull or after merge
+'''
+
 
 import sys
 import os
 import socket
 import subprocess
-from util import color, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd
+from util import color, diff_file_path, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd, pg_sync
 
 print(color.pink('=============DEV_POST_MERGE_HOOK================'))
 print(color.yellow(str(sys.argv)))
@@ -16,10 +18,25 @@ print(color.yellow(str(input)))
 command = cmd(['ps', '-o', 'args='+str(os.getppid())])
 command = command.splitlines()
 print(command[2])
+current_branch = get_branch_name()
 if command[2].startswith('git pull'):
     print('It is pull!')
+    pg_sync(pg_from_env='pb_branch',
+            pg_to_env='bg_dev',
+            pg_from_db=current_branch,
+            pg_to_db=current_branch,
+            pg_sql_file=diff_file_path('pull'),
+            pg_apply=True)
 elif command[2].startswith('git merge'):
-    print('It is merge with ', command[2].strip("git merge "))
+    source_branch = command[2].strip("git merge ");
+    print('It is merge with ', source_branch)
+    pg_sync(pg_from_env='bg_dev',
+            pg_to_env='bg_dev',
+            pg_from_db=source_branch,
+            pg_to_db=current_branch,
+            pg_sql_file=diff_file_path('pull'),
+            pg_apply=True,
+            pg_create_to_db=True)
 
 # Check multi commit merge
 # Solve git fetch hook
