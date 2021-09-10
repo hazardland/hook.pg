@@ -101,7 +101,8 @@ def pg_sync(pg_from_env,
         if pg_create_to_db:
             try:
                 subprocess.call(['psql',f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/', 
-                    '-c', f'CREATE DATABASE {pg_to_db}'])
+                    '-c', f'CREATE DATABASE {pg_to_db}'],
+                    stderr=subprocess.DEVNULL)
             except:
                 pass  
         
