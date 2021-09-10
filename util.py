@@ -160,7 +160,7 @@ def diff_file_path(name, exit_if_absent=False):
     if not exit_if_absent and not os.path.exists(sql_diff_path):
         cmd(['mkdir', sql_diff_path])
 
-    path = os.path.join(sql_diff_path, commit_hash+'.'+name+'.push.sql')
+    path = os.path.join(sql_diff_path, commit_hash+'.'+name+'.sql')
 
     if exit_if_absent and not os.path.exists(sql_diff_path):
         print(color.red('Diff file not found'))
