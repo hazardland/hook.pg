@@ -66,11 +66,12 @@ def pg_env(pg_server_type):
             os.getenv('PG_BRANCH_PORT'),
             os.getenv('PG_BRANCH_PASSWORD'),
             os.getenv('PG_BRANCH_USERNAME'))
-    if pg_server_type=='pg_env':
+    if pg_server_type=='pg_dev':
         return (socket.gethostbyname(os.getenv('PG_DEV_HOSTNAME')),
         os.getenv('PG_DEV_PORT'),
         os.getenv('PG_DEV_PASSWORD').replace("\"", "\\\""),
         os.getenv('PG_DEV_USERNAME'))
+
     raise Exception('unknown_env')
 
 # The function is used for diff generation and diff apply
