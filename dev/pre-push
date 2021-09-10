@@ -47,5 +47,5 @@ if source_branch!=current_branch and target_branch!=current_branch:
 # Apply diff to branch database
 pg_apply(pg_to_env='pg_branch', 
          pg_to_db=target_branch, 
-         pg_sql_file=diff_file_path('psuh', exit_if_absent=True))
+         pg_sql_file=diff_file_path('push', exit_if_absent=True))
 
