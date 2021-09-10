@@ -39,7 +39,7 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
         print(color.cyan('Commit hash'), color.yellow(git_hash))
 
         pg_sync(pg_from_env='pg_branch', 
-                pg_to_env='pg_branch', 
+                pg_to_env='pg_dev', # This is only different from pg_branch simmilar hook 
                 pg_from_db=parent_branch, 
                 pg_to_db=current_branch, 
                 pg_sql_file=db_init_sql_file, 
