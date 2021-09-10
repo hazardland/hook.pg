@@ -26,7 +26,9 @@ if command[2].startswith('git pull'):
             pg_from_db=current_branch,
             pg_to_db=current_branch,
             pg_sql_file=diff_file_path('pull'),
-            pg_apply=True)
+            pg_apply=True,
+            pg_create_from_db=True,
+            pg_create_to_db=True)
 elif command[2].startswith('git merge'):
     source_branch = command[2].strip("git merge ");
     print('It is merge with ', source_branch)
@@ -36,6 +38,7 @@ elif command[2].startswith('git merge'):
             pg_to_db=current_branch,
             pg_sql_file=diff_file_path('pull'),
             pg_apply=True,
+            pg_create_from_db=True,
             pg_create_to_db=True)
 
 # Check multi commit merge
