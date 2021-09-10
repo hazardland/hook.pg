@@ -21,8 +21,8 @@ print(command[2])
 current_branch = get_branch_name()
 if command[2].startswith('git pull'):
     print('It is pull!')
-    pg_sync(pg_from_env='pb_branch',
-            pg_to_env='bg_dev',
+    pg_sync(pg_from_env='pg_branch',
+            pg_to_env='pg_dev',
             pg_from_db=current_branch,
             pg_to_db=current_branch,
             pg_sql_file=diff_file_path('pull'),
@@ -30,8 +30,8 @@ if command[2].startswith('git pull'):
 elif command[2].startswith('git merge'):
     source_branch = command[2].strip("git merge ");
     print('It is merge with ', source_branch)
-    pg_sync(pg_from_env='bg_dev',
-            pg_to_env='bg_dev',
+    pg_sync(pg_from_env='pg_dev',
+            pg_to_env='pg_dev',
             pg_from_db=source_branch,
             pg_to_db=current_branch,
             pg_sql_file=diff_file_path('pull'),
