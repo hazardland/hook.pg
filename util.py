@@ -99,7 +99,7 @@ def pg_sync(pg_from_env,
         print(color.cyan('Sql file is '+pg_sql_file))
 
         if pg_create_to_db:
-            print('Checking db '+pg_to_db+'@'+pg_to_env+'...')
+            print('Checking target db '+pg_to_db+'@'+pg_to_env+'...')
             try:
                 subprocess.call(['psql',f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/', 
                     '-c', f'CREATE DATABASE {pg_to_db}'],
@@ -116,7 +116,7 @@ def pg_sync(pg_from_env,
             return
 
         if pg_create_from_db:
-            print('Checking db '+pg_from_db+'@'+pg_from_env+'...')
+            print('Checking source db '+pg_from_db+'@'+pg_from_env+'...')
             try:
                 subprocess.call(['psql',f'postgresql://{pg_from_username}:{pg_from_password}@{pg_from_hostname}:{pg_from_port}/', 
                     '-c', f'CREATE DATABASE {pg_from_db}'],
@@ -157,12 +157,19 @@ def pg_sync(pg_from_env,
 
 def pg_apply(pg_to_env, pg_to_db, pg_sql_file, pg_create_to_db=False):
     pg_to_hostname, pg_to_port, pg_to_password, pg_to_username = pg_env(pg_to_env)
+
+    print(color.cyan('To db: '), color.yellow(pg_to_db)+color.green('@'+pg_to_env))
+    print(color.cyan('Sql file is '+pg_sql_file))
+
     if pg_create_to_db:
+        print('Checking target db '+pg_to_db+'@'+pg_to_env+'...')
         try:
             subprocess.call(['psql',f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/', 
                 '-c', f'CREATE DATABASE {pg_to_db}'])
         except:
             pass
+    
+    print(color.green('Executing sql file...'))
     cmd(['psql',f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/{pg_to_db}', 
         '--set', 'ON_ERROR_STOP=on',
         '-f', pg_sql_file])
