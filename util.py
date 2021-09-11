@@ -171,7 +171,11 @@ def diff_file_path(name, exit_if_absent=False, local=False):
     commit_hash = get_commit_hash()
     print(color.cyan('Commit hash:'), color.yellow(commit_hash))
 
-    sql_diff_path = os.path.join(cmd(['pwd']), '.data' if local else '.git', 'sql')
+    sql_diff_path = None
+    if local:
+        sql_diff_path = os.path.join(cmd(['pwd']), '.data')
+    else:
+        sql_diff_path = os.path.join(cmd(['pwd']), '.git', 'sql')
     if not exit_if_absent and not os.path.exists(sql_diff_path):
         cmd(['mkdir', sql_diff_path])
 
