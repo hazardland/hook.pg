@@ -32,6 +32,6 @@ branch_name = get_branch_name()
 
 diff_file = diff_file_path('push', local=True)
 
-cmd['touch', diff_file]
+cmd(['touch', diff_file])
 cmd(['git', 'add', diff_file])
 cmd(['git', 'commit', '--amend', '-C', 'HEAD', '--no-verify'])
