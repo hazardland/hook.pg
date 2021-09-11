@@ -102,7 +102,7 @@ def pg_sync(pg_from_env,
         #print(f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/{pg_to_db}')
 
         if pg_create_from_db:
-            print('Checking '+pg_from_db+'@'+pg_from_env+' db')
+            print('Checking db '+pg_from_db+'@'+pg_from_env+'...')
             try:
                 subprocess.call(['psql',f'postgresql://{pg_from_username}:{pg_from_password}@{pg_from_hostname}:{pg_from_port}/', 
                     '-c', f'CREATE DATABASE {pg_from_db}'],
@@ -111,7 +111,7 @@ def pg_sync(pg_from_env,
                 pass 
 
         if pg_create_to_db:
-            print('Checking '+pg_to_db+'@'+pg_to_env+' db')
+            print('Checking db '+pg_to_db+'@'+pg_to_env+'...')
             try:
                 subprocess.call(['psql',f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/', 
                     '-c', f'CREATE DATABASE {pg_to_db}'],
