@@ -20,17 +20,16 @@ import socket
 import subprocess
 from util import color, cmd, diff_file_path, get_branch_name, get_commit_hash, get_exec_data, pg_sync, undo_commit
 
-# No looping
-if not os.path.exists('.commit'):
-    sys.exit(0)
-
-cmd(['rm', '.commit'])
+# # No looping
+# if not os.path.exists('.commit'):
+#     sys.exit(0)
+# cmd(['rm', '.commit'])
 
 get_exec_data('DEV_POST_COMMIT_HOOK')
 
 branch_name = get_branch_name()
 
-diff_file = diff_file_path('push', local=True)
+diff_file = diff_file_path('push', local=False)
 
 pg_sync(pg_from_env='pg_dev', 
         pg_to_env='pg_branch', 
@@ -41,8 +40,8 @@ pg_sync(pg_from_env='pg_dev',
         pg_create_to_db=True,
         pg_apply=False)
 
-cmd(['git', 'add', diff_file])
-cmd(['git', 'commit', '--amend', '-C', 'HEAD', '--no-verify'])
+# cmd(['git', 'add', diff_file])
+# cmd(['git', 'commit', '--amend', '-C', 'HEAD', '--no-verify'])
 
 # Create new branch and commit (?)
 #   Maybe post-checkout hook will do it

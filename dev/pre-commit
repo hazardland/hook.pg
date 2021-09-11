@@ -4,6 +4,9 @@
     Avoiding loop by placing .commit file in pre-commit and deleting in post-commit
 """
 
+import sys
+sys.exit(0)
+
 from util import cmd
 
 cmd(['touch', '.commit'])
