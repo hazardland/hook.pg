@@ -84,7 +84,12 @@ def pg_sync(pg_from_env,
                    pg_create_from_db=False, 
                    pg_create_to_db=False):
 
-        
+        if pg_from_db:
+            pg_from_db = pg_from_db.strip()
+
+        if pg_to_db:
+            pg_to_db = pg_to_db.strip()
+
         pg_from_hostname, pg_from_port, pg_from_password, pg_from_username = pg_env(pg_from_env)
         pg_to_hostname, pg_to_port, pg_to_password, pg_to_username = pg_env(pg_to_env)
   
