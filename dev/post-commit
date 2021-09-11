@@ -2,6 +2,7 @@
 
 """
     This hook happens after commit
+    (it is post-commit in pre-commit you do not know commit hash)
 
     This hook creates .git/[commit_hash].sql difference file
     Between developer database and remote branch database
@@ -21,20 +22,21 @@ from util import color, cmd, diff_file_path, get_branch_name, get_commit_hash, g
 
 get_exec_data('DEV_POST_COMMIT_HOOK')
 
-branch_name = 'master'
-try:
-    branch_name = get_branch_name()
-except:
-    pass
+branch_name = get_branch_name()
+
+diff_file = diff_file_path('push', local=True)
 
 pg_sync(pg_from_env='pg_dev', 
         pg_to_env='pg_branch', 
         pg_from_db=branch_name, 
         pg_to_db=branch_name, 
-        pg_sql_file=diff_file_path('push'),
+        pg_sql_file=diff_file,
         pg_create_from_db=True,
         pg_create_to_db=True,
         pg_apply=False)
+
+cmd(['git', 'add', diff_file])
+cmd(['git', 'commit', '--amend', '-C', 'HEAD', '--no-verify'])
 
 # Create new branch and commit (?)
 #   Maybe post-checkout hook will do it

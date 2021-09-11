@@ -167,11 +167,11 @@ def pg_apply(pg_to_env, pg_to_db, pg_sql_file, pg_create_to_db=False):
         '--set', 'ON_ERROR_STOP=on',
         '-f', pg_sql_file])
 
-def diff_file_path(name, exit_if_absent=False):
+def diff_file_path(name, exit_if_absent=False, local=False):
     commit_hash = get_commit_hash()
     print(color.cyan('Commit hash:'), color.yellow(commit_hash))
 
-    sql_diff_path = os.path.join(cmd(['pwd']), '.git', 'sql')
+    sql_diff_path = os.path.join(cmd(['pwd']), '.data' if local else '.git', 'sql')
     if not exit_if_absent and not os.path.exists(sql_diff_path):
         cmd(['mkdir', sql_diff_path])
 
