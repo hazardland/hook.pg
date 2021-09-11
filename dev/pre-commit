@@ -21,7 +21,11 @@ from util import color, cmd, diff_file_path, get_branch_name, get_commit_hash, g
 
 get_exec_data('DEV_POST_COMMIT_HOOK')
 
-branch_name = get_branch_name()
+branch_name = 'master'
+try:
+    branch_name = get_branch_name()
+except:
+    pass
 
 pg_sync(pg_from_env='pg_dev', 
         pg_to_env='pg_branch', 
