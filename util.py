@@ -93,9 +93,16 @@ def pg_sync(pg_from_env,
 
         print(color.cyan('Sql file is '+pg_sql_file))
 
+        # I did not remember why is this there (?)
+        if not pg_from_db:
+            print(color.red('Exiting no from db provided'))
+            cmd(['touch', pg_sql_file])
+            sys.exit(0)
+
         #print(f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/{pg_to_db}')
 
         if pg_create_from_db:
+            print('Checking '+pg_from_db+' db')
             try:
                 subprocess.call(['psql',f'postgresql://{pg_from_username}:{pg_from_password}@{pg_from_hostname}:{pg_from_port}/', 
                     '-c', f'CREATE DATABASE {pg_from_db}'],
@@ -104,17 +111,13 @@ def pg_sync(pg_from_env,
                 pass 
 
         if pg_create_to_db:
+            print('Checking '+pg_to_db+' db')
             try:
                 subprocess.call(['psql',f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/', 
                     '-c', f'CREATE DATABASE {pg_to_db}'],
                     stderr=subprocess.DEVNULL)
             except:
-                pass  
-        
-        # I did not remember why is this there (?)
-        if not pg_from_db:
-            cmd(['touch', pg_sql_file])
-            sys.exit(0)
+                pass
 
         try:
             cmd(['pgquarrel',
@@ -136,6 +139,7 @@ def pg_sync(pg_from_env,
             print(color.green(pg_sql_file))
 
             if pg_apply:
+                print(color.green('Executing sql file...'))
                 cmd(['psql',f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/{pg_to_db}', 
                     '--set', 'ON_ERROR_STOP=on',
                     '-f', pg_sql_file])
