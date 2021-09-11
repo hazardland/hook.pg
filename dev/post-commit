@@ -28,6 +28,8 @@ pg_sync(pg_from_env='pg_dev',
         pg_from_db=branch_name, 
         pg_to_db=branch_name, 
         pg_sql_file=diff_file_path('push'),
+        pg_create_from_db=True,
+        pg_create_to_db=True,
         pg_apply=False)
 
 # Create new branch and commit (?)
