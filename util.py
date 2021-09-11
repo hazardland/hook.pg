@@ -98,13 +98,22 @@ def pg_sync(pg_from_env,
 
         print(color.cyan('Sql file is '+pg_sql_file))
 
-        # I did not remember why is this there (?)
-        if not pg_from_db:
-            print(color.red('Exiting no from db provided'))
-            cmd(['touch', pg_sql_file])
-            sys.exit(0)
+        if pg_create_to_db:
+            print('Checking db '+pg_to_db+'@'+pg_to_env+'...')
+            try:
+                subprocess.call(['psql',f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/', 
+                    '-c', f'CREATE DATABASE {pg_to_db}'],
+                    stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            except:
+                pass
 
         #print(f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/{pg_to_db}')
+
+        # I did not remember why is this there (?)
+        if not pg_from_db:
+            print(color.pink('No from db provided nothing to compare, try commit first?'))
+            cmd(['touch', pg_sql_file])
+            return
 
         if pg_create_from_db:
             print('Checking db '+pg_from_db+'@'+pg_from_env+'...')
@@ -114,15 +123,6 @@ def pg_sync(pg_from_env,
                     stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
             except:
                 pass 
-
-        if pg_create_to_db:
-            print('Checking db '+pg_to_db+'@'+pg_to_env+'...')
-            try:
-                subprocess.call(['psql',f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/', 
-                    '-c', f'CREATE DATABASE {pg_to_db}'],
-                    stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-            except:
-                pass
 
         try:
             cmd(['pgquarrel',
