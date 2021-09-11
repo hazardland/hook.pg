@@ -1,0 +1,9 @@
+#!/usr/bin/python3
+
+"""
+    Avoiding loop by placing .commit file in pre-commit and deleting in post-commit
+"""
+
+from util import cmd
+
+cmd(['touch', '.commit'])

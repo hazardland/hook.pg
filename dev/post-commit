@@ -20,6 +20,12 @@ import socket
 import subprocess
 from util import color, cmd, diff_file_path, get_branch_name, get_commit_hash, get_exec_data, pg_sync, undo_commit
 
+# No looping
+if os.path.exists('.commit'):
+    sys.exit(0)
+
+cmd(['rm', '.commit'])
+
 get_exec_data('DEV_POST_COMMIT_HOOK')
 
 branch_name = get_branch_name()
