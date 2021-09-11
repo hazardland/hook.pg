@@ -177,6 +177,9 @@ def diff_file_path(name, exit_if_absent=False, local=False):
 
     path = os.path.join(sql_diff_path, commit_hash+'.'+name+'.sql')
 
+    if local:
+        cmd(['touch', path])
+
     if exit_if_absent and not os.path.exists(sql_diff_path):
         print(color.red('Diff file not found'))
         sys.exit(1)
