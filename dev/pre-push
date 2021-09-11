@@ -13,30 +13,22 @@ import sys
 import os
 import socket
 import subprocess
-from util import diff_file_path, pg_apply, color, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd
+from util import diff_file_path, get_exec_data, pg_apply, color, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd
 
-# Get stdin input
-input = get_stdin_input()
-if input is None:
-    print(color.cyan('Nothing is being pushed'))
-    sys.exit(0)
+# Get exec data
+command, input = get_exec_data('DEV_PRE_PUSH_HOOK')
 
 # Extract input and get source branch and target branch
-source_branch = None
-target_branch = None
 source_branch, _, target_branch, _ = input
 source_branch = extract_branch_name(source_branch)
 target_branch = extract_branch_name(target_branch)
-print(color.cyan('Push from branch:'), color.yellow(source_branch))
-print(color.cyan('Push to branch:'), color.yellow(target_branch))
 
 # Get what branch is active (it differs from source branch)
 current_branch = get_branch_name()
-print(color.cyan('Current branch:'), color.yellow(current_branch))
 
 # Disable pushing in master or in staging branches
 if target_branch=='master' or target_branch=='staging' or target_branch=='main':
-    print(color.red('Pushing directly to'), color.yellow(target_branch), color.red('not allowed'))
+    print(color.red('Pushing directly to remote'), color.yellow(target_branch), color.red('not allowed'))
     sys.exit(1)
 
 # Disable pushing from different branch other than current

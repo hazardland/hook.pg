@@ -8,10 +8,9 @@ import sys
 import os
 import socket
 import subprocess
-from util import color, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd, pg_sync
+from util import color, get_branch_name, get_commit_hash, get_exec_data, get_stdin_input, extract_branch_name, cmd, pg_sync
 
-print(color.pink('We are in post checkout now!'))
-print(color.yellow(str(sys.argv)))
+get_exec_data('DEV_POST_CHECKOUT_HOOK')
 
 # The hook is given three parameters: the ref of the previous HEAD, 
 # the ref of the new HEAD (which may or may not have changed), 
@@ -26,17 +25,10 @@ if len(sys.argv)>=4 and sys.argv[1]==sys.argv[2] and sys.argv[3]=='1':
         cmd(['mkdir', db_check_path])
     current_branch = get_branch_name()
     db_init_sql_file = os.path.join(db_check_path, current_branch+'.sql')
-
-    print(color.cyan('File to check is'+db_init_sql_file))
     
     # If new branch has no corresponding database created then we do it here
     if current_branch not in ['master', 'staging', 'main'] and not os.path.exists(db_init_sql_file):
-        print(color.cyan('Creating database for '+current_branch))
         parent_branch = cmd(['git', 'parent'])
-        print(color.cyan('From branch: '), color.yellow(parent_branch))
-        print(color.cyan('To branch: '), color.yellow(current_branch))
-        git_hash = get_commit_hash()
-        print(color.cyan('Commit hash'), color.yellow(git_hash))
 
         pg_sync(pg_from_env='pg_branch', 
                 pg_to_env='pg_dev', # This is only different from pg_branch simmilar hook 

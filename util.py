@@ -88,7 +88,12 @@ def pg_sync(pg_from_env,
         pg_from_hostname, pg_from_port, pg_from_password, pg_from_username = pg_env(pg_from_env)
         pg_to_hostname, pg_to_port, pg_to_password, pg_to_username = pg_env(pg_to_env)
   
-        print(f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/{pg_to_db}')
+        print(color.cyan('From db: '), color.yellow(pg_from_db)+color.green('@'+pg_from_env))
+        print(color.cyan('To db: '), color.yellow(pg_to_db)+color.green('@'+pg_to_env))
+
+        print(color.cyan('Sql file is '+pg_sql_file))
+
+        #print(f'postgresql://{pg_to_username}:{pg_to_password}@{pg_to_hostname}:{pg_to_port}/{pg_to_db}')
 
         if pg_create_from_db:
             try:
@@ -168,3 +173,14 @@ def diff_file_path(name, exit_if_absent=False):
         sys.exit(1)
 
     return path
+
+
+def get_exec_data(name, debug=True):
+    print(color.pink('=============='+name.upper() +'==============='))
+    print(color.yellow(str(sys.argv)))
+    input = get_stdin_input()
+    print(color.yellow(str(input)))
+    command = cmd(['ps', '-o', 'args='+str(os.getppid())])
+    print(command)
+    command = command.splitlines()
+    return (command, input)
