@@ -50,27 +50,43 @@ def get_stdin_input():
         return line.strip().split()
 
 # This function will provide env variables for requested server type
-def pg_env(pg_server_type):
+def pg_env(pg_server_type, pg_target_db):
+
+    if pg_target_db:
+        pg_target_db = pg_target_db.strip()
+
     if pg_server_type=='pg_branch':
+        pg_master_database = os.getenv('PG_MASTER_DATABASE')
+        pg_master_server = os.getenv('PG_MASTER_SERVER')
+        if pg_master_server != '':
+            pg_target_db = pg_target_db + '_' + pg_master_server
+        if pg_master_database != '':
+            pg_target_db = pg_target_db + '_' + pg_master_database
         return (socket.gethostbyname(os.getenv('PG_BRANCH_HOSTNAME')),
             os.getenv('PG_BRANCH_PORT'),
             os.getenv('PG_BRANCH_PASSWORD'),
-            os.getenv('PG_BRANCH_USERNAME'))
+            os.getenv('PG_BRANCH_USERNAME'),
+            pg_target_db)
     if pg_server_type=='pg_master':
-        return (socket.gethostbyname(os.getenv('PG_BRANCH_HOSTNAME')),
-            os.getenv('PG_BRANCH_PORT'),
-            os.getenv('PG_BRANCH_PASSWORD'),
-            os.getenv('PG_BRANCH_USERNAME'))
+        pg_target_db = os.getenv('PG_MASTER_DATABASE')
+        return (socket.gethostbyname(os.getenv('PG_MASTER_HOSTNAME')),
+            os.getenv('PG_MASTER_PORT'),
+            os.getenv('PG_MASTER_PASSWORD'),
+            os.getenv('PG_MASTER_USERNAME'),
+            pg_target_db)
     if pg_server_type=='pg_staging':
-        return (socket.gethostbyname(os.getenv('PG_BRANCH_HOSTNAME')),
-            os.getenv('PG_BRANCH_PORT'),
-            os.getenv('PG_BRANCH_PASSWORD'),
-            os.getenv('PG_BRANCH_USERNAME'))
+        pg_target_db = os.getenv('PG_STAGING_DATABASE')
+        return (socket.gethostbyname(os.getenv('PG_STAGING_HOSTNAME')),
+            os.getenv('PG_STAGING_PORT'),
+            os.getenv('PG_STAGING_PASSWORD'),
+            os.getenv('PG_STAGING_USERNAME'),
+            pg_target_db)
     if pg_server_type=='pg_dev':
         return (socket.gethostbyname(os.getenv('PG_DEV_HOSTNAME')),
         os.getenv('PG_DEV_PORT'),
         os.getenv('PG_DEV_PASSWORD').replace("\"", "\\\""),
-        os.getenv('PG_DEV_USERNAME'))
+        os.getenv('PG_DEV_USERNAME'),
+        pg_target_db)
 
     raise Exception('unknown_env')
 
@@ -84,14 +100,8 @@ def pg_sync(pg_from_env,
                    pg_create_from_db=False, 
                    pg_create_to_db=False):
 
-        if pg_from_db:
-            pg_from_db = pg_from_db.strip()
-
-        if pg_to_db:
-            pg_to_db = pg_to_db.strip()
-
-        pg_from_hostname, pg_from_port, pg_from_password, pg_from_username = pg_env(pg_from_env)
-        pg_to_hostname, pg_to_port, pg_to_password, pg_to_username = pg_env(pg_to_env)
+        pg_from_hostname, pg_from_port, pg_from_password, pg_from_username, pg_from_db = pg_env(pg_from_env, pg_from_db)
+        pg_to_hostname, pg_to_port, pg_to_password, pg_to_username, pg_to_db = pg_env(pg_to_env, pg_to_db)
   
         print(color.cyan('From db: '), color.yellow(pg_from_db)+color.green('@'+pg_from_env))
         print(color.cyan('To db: '), color.yellow(pg_to_db)+color.green('@'+pg_to_env))
@@ -156,7 +166,7 @@ def pg_sync(pg_from_env,
             sys.exit(1)
 
 def pg_apply(pg_to_env, pg_to_db, pg_sql_file, pg_create_to_db=False):
-    pg_to_hostname, pg_to_port, pg_to_password, pg_to_username = pg_env(pg_to_env)
+    pg_to_hostname, pg_to_port, pg_to_password, pg_to_username, pg_to_db = pg_env(pg_to_env, pg_to_db)
 
     print(color.cyan('To db: '), color.yellow(pg_to_db)+color.green('@'+pg_to_env))
     print(color.cyan('Sql file is '+pg_sql_file))

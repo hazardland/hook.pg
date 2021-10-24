@@ -9,18 +9,18 @@ import sys
 import os
 import socket
 import subprocess
-from util import color, diff_file_path, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd, pg_sync
+from util import color, diff_file_path, get_branch_name, get_commit_hash, get_stdin_input, extract_branch_name, cmd, pg_sync, get_exec_data
 
-print(color.pink('=============DEV_POST_MERGE_HOOK================'))
-print(color.yellow(str(sys.argv)))
-input = get_stdin_input()
-print(color.yellow(str(input)))
-command = cmd(['ps', '-o', 'args='+str(os.getppid())])
-command = command.splitlines()
+command, input = get_exec_data('DEV_POST_MERGE_HOOK')
+
 print(command[2])
 current_branch = get_branch_name()
 if command[2].startswith('git pull'):
     print('It is pull!')
+    # Here can be integrated master and staging pull also
+    # Like
+    # if current_branch='staging': pg_from_env='staging'
+    # elif current_branch='master': pg_from_env='master'
     pg_sync(pg_from_env='pg_branch',
             pg_to_env='pg_dev',
             pg_from_db=current_branch,
