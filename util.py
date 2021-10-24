@@ -58,10 +58,13 @@ def pg_env(pg_server_type, pg_target_db):
     if pg_server_type=='pg_branch':
         pg_master_database = os.getenv('PG_MASTER_DATABASE')
         pg_master_server = os.getenv('PG_MASTER_SERVER')
+        pg_target_db_copy = pg_target_db
+        pg_target_db = ""
         if pg_master_server != '':
-            pg_target_db = pg_target_db + '_' + pg_master_server
-        if pg_master_database != '':
-            pg_target_db = pg_target_db + '_' + pg_master_database
+            pg_target_db = pg_master_server + '_'
+        if pg_master_database != '':            
+            pg_target_db = pg_target_db + pg_master_database + '_'
+        pg_target_db = pg_target_db + pg_target_db_copy    
         return (socket.gethostbyname(os.getenv('PG_BRANCH_HOSTNAME')),
             os.getenv('PG_BRANCH_PORT'),
             os.getenv('PG_BRANCH_PASSWORD'),
